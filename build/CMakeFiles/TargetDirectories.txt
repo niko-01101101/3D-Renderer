@@ -1,0 +1,3 @@
+C:/Users/niko/OneDrive/Documents/GitHub/MyGL/build/CMakeFiles/renderer.dir
+C:/Users/niko/OneDrive/Documents/GitHub/MyGL/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/niko/OneDrive/Documents/GitHub/MyGL/build/CMakeFiles/ZERO_CHECK.dir

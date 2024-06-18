@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\build\CMakeFiles\c1b17bbac159fab1a9af6e14d613ca55\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{3614A86C-0E94-3D56-AF8D-20424CB1CA8B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+^C:\USERS\NIKO\ONEDRIVE\DOCUMENTS\GITHUB\MYGL\BUILD\CMAKEFILES\C1B17BBAC159FAB1A9AF6E14D613CA55\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/niko/OneDrive/Documents/GitHub/MyGL -BC:/Users/niko/OneDrive/Documents/GitHub/MyGL/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/niko/OneDrive/Documents/GitHub/MyGL/build/MyGL.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
