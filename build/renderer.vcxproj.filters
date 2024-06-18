@@ -10,12 +10,24 @@
     <ClCompile Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\render_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

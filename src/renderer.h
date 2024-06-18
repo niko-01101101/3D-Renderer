@@ -3,10 +3,15 @@
 #include <stdint.h>
 #include <iostream>
 #include "window.h"
+#include <vector>
+#include <cmath>
+#include "model.h"
+#include "geometry.h"
 
 class Renderer{
   Window* rWindow = new Window();
-  
+  Model *model; 
+
   public:
     Renderer(int width, int height);
 
