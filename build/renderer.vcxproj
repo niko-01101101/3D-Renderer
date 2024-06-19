@@ -336,7 +336,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\renderer.h" />
     <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\model.h" />
     <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\geometry.h" />
-    <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\render_types.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\build\ZERO_CHECK.vcxproj">

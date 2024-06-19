@@ -27,9 +27,6 @@
     <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\src\render_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\niko\OneDrive\Documents\GitHub\MyGL\CMakeLists.txt" />
