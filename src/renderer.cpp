@@ -3,6 +3,10 @@
 #include "renderer.h"
 
 Model *model = NULL;
+int *zbuffer = NULL;
+Vec3f light_dir(0,0,-1);
+Vec3f camera(0,0,3);
+
 U32 white = 0xffffff;
 U32 red = 0xff0000;
 U32 green = 0x00ff00;
@@ -10,6 +14,32 @@ U32 blue = 0x0000ff;
 
 int clientWidth;
 int clientHeight;
+const int depth  = 255;
+
+Vec3f m2v(Matrix m) {
+    return Vec3f(m[0][0]/m[3][0], m[1][0]/m[3][0], m[2][0]/m[3][0]);
+}
+
+Matrix v2m(Vec3f v) {
+    Matrix m(4, 1);
+    m[0][0] = v.x;
+    m[1][0] = v.y;
+    m[2][0] = v.z;
+    m[3][0] = 1.f;
+    return m;
+}
+
+Matrix viewport(int x, int y, int w, int h) {
+    Matrix m = Matrix::identity(4);
+    m[0][3] = x+w/2.f;
+    m[1][3] = y+h/2.f;
+    m[2][3] = depth/2.f;
+
+    m[0][0] = w/2.f;
+    m[1][1] = h/2.f;
+    m[2][2] = depth/2.f;
+    return m;
+}
 
 Renderer::Renderer(int width, int height) {
   clientWidth = width;
@@ -39,15 +69,17 @@ Renderer::Renderer(int width, int height) {
       //       } 
       // }
 
+    float *zbuffer = new float[width*height];
+    for (int i=width*height; i--; zbuffer[i] = -99999999999999);
+
     //Rasterization 
     for (int i=0; i<model->nfaces(); i++) { 
-      std::vector<int> face = model->face(i); 
-      Vec2i screen_coords[3]; 
-      for (int j=0; j<3; j++) { 
-        Vec3f world_coords = model->vert(face[j]); 
-        screen_coords[j] = Vec2i((world_coords.x+1.)*width/2., (world_coords.y+1.)*height/2.); 
-      } 
-      DrawTriangle(screen_coords, RgbToHex(rand()%255, rand()%255, rand()%255)); 
+      std::vector<int> face = model->face(i);
+        Vec3f pts[3];
+        for (int i=0; i<3; i++) pts[i] = WorldToScreen(model->vert(face[i]));
+        float intensity =  10; 
+        DrawTriangle(pts, zbuffer, RgbToHex(intensity, intensity, intensity)); 
+    
   }
     
 		if (!rWindow->ProcessMessages()) {
@@ -58,6 +90,10 @@ Renderer::Renderer(int width, int height) {
 
   delete model;
 	delete rWindow;
+}
+
+Vec3f Renderer::WorldToScreen(Vec3f v) {
+    return Vec3f(int((v.x+1.)*clientWidth/2.+.5), int((v.y+1.)*clientHeight/2.+.5), v.z);
 }
 
 string Renderer::CompToHex(int n) {
@@ -103,32 +139,41 @@ U32 Renderer::RgbToHex(int r, int g, int b) {
     return res;
 }
 
-Vec3f Renderer::Barycentric(Vec2i *pts, Vec2i P) { 
+Vec3f Renderer::Barycentric(Vec3f *pts, Vec3f P) { 
     Vec3f u = Vec3f(pts[2].x-pts[0].x, pts[1].x-pts[0].x, pts[0].x-P.x)^Vec3f(pts[2].y-pts[0].y, pts[1].y-pts[0].y, pts[0].y-P.y);
     if (std::abs(u.z) < 1) return Vec3f(-1, 1, 1);
     return Vec3f(1.0f-(u.x+u.y)/u.z, u.y/u.z, u.x/u.z); 
 } 
 
-void Renderer::DrawTriangle(Vec2i *pts, U32 color) {
-    Vec2i bboxmin(clientWidth-1,  clientHeight-1); 
-    Vec2i bboxmax(0, 0); 
-    Vec2i clamp(clientWidth-1, clientHeight-1); 
-    for (int i = 0; i < 3; i++) { 
-        bboxmin.x = IntMax(0, IntMin(bboxmin.x, pts[i].x));
-	      bboxmin.y = IntMax(0, IntMin(bboxmin.y, pts[i].y));
+void Renderer::DrawTriangle(Vec3i t0, Vec3i t1, Vec3i t2, Vec2i uv0, Vec2i uv1, Vec2i uv2, float intensity, int *zbuffer) {
+    if (t0.y==t1.y && t0.y==t2.y) return; // i dont care about degenerate triangles
+    if (t0.y>t1.y) { std::swap(t0, t1); std::swap(uv0, uv1); }
+    if (t0.y>t2.y) { std::swap(t0, t2); std::swap(uv0, uv2); }
+    if (t1.y>t2.y) { std::swap(t1, t2); std::swap(uv1, uv2); }
 
-	      bboxmax.x = IntMin(clamp.x, IntMax(bboxmax.x, pts[i].x));
-	      bboxmax.y = IntMin(clamp.y, IntMax(bboxmax.y, pts[i].y));
-    } 
-    
-    Vec2i P; 
-    for (P.x = bboxmin.x; P.x <= bboxmax.x; P.x++) { 
-        for (P.y = bboxmin.y; P.y <= bboxmax.y; P.y++) { 
-            Vec3f bc_screen  = Barycentric(pts, P); 
-            if (bc_screen.x < 0 || bc_screen.y < 0 || bc_screen.z < 0) continue; 
-            rWindow->DrawPixel(P.x, P.y, color);
-        } 
-    }  
+    int total_height = t2.y-t0.y;
+    for (int i=0; i<total_height; i++) {
+        bool second_half = i>t1.y-t0.y || t1.y==t0.y;
+        int segment_height = second_half ? t2.y-t1.y : t1.y-t0.y;
+        float alpha = (float)i/total_height;
+        float beta  = (float)(i-(second_half ? t1.y-t0.y : 0))/segment_height; // be careful: with above conditions no division by zero here
+        Vec3i A   =               t0  + Vec3f(t2-t0  )*alpha;
+        Vec3i B   = second_half ? t1  + Vec3f(t2-t1  )*beta : t0  + Vec3f(t1-t0  )*beta;
+        Vec2i uvA =               uv0 +      (uv2-uv0)*alpha;
+        Vec2i uvB = second_half ? uv1 +      (uv2-uv1)*beta : uv0 +      (uv1-uv0)*beta;
+        if (A.x>B.x) { std::swap(A, B); std::swap(uvA, uvB); }
+        for (int j=A.x; j<=B.x; j++) {
+            float phi = B.x==A.x ? 1. : (float)(j-A.x)/(float)(B.x-A.x);
+            Vec3i   P = Vec3f(A) + Vec3f(B-A)*phi;
+            Vec2i uvP =     uvA +   (uvB-uvA)*phi;
+            int idx = P.x+P.y*width;
+            if (zbuffer[idx]<P.z) {
+                zbuffer[idx] = P.z;
+                TGAColor color = model->diffuse(uvP);
+                image.set(P.x, P.y, TGAColor(color.r*intensity, color.g*intensity, color.b*intensity));
+            }
+        }
+    }
 }
 
 void Renderer::DrawLine(Vec2i v0, Vec2i v1, U32 color) { 

@@ -12,6 +12,7 @@ using namespace std;
 #include <string>
 #include <cstdint>
 #include <sstream>
+#include <limits>
 
 class Renderer{
   Window* rWindow = new Window();
@@ -21,9 +22,10 @@ class Renderer{
     Renderer(int width, int height);
 
     string CompToHex(int n);
+    Vec3f WorldToScreen(Vec3f v);
     U32 RgbToHex(int r, int g, int b);
-    Vec3f Barycentric(Vec2i *pts, Vec2i P);
-    void DrawTriangle(Vec2i *pts, U32 color);
+    Vec3f Barycentric(Vec3f *pts, Vec3f P);
+    void DrawTriangle(Vec3i t0, Vec3i t1, Vec3i t2, Vec2i uv0, Vec2i uv1, Vec2i uv2, float intensity, int *zbuffer);
     void DrawLine(Vec2i v0, Vec2i v1, U32 color);
     int IntMax(int a, int b);
     int IntMin(int a, int b);
